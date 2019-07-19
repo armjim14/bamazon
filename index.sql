@@ -16,3 +16,6 @@ create table bitems (
 
 insert into bitems (itemName, dept, price, quantity)
 values ("name", "dept", 20.00, 10);
+
+insert into bitems (itemName, dept, price, quantity)
+values ("bike", "outdoors", 50, 20);
