@@ -139,3 +139,39 @@ function nextAddTwo(id, amount, quan){
         start();
     })
 }
+
+function postItem(){
+    inq.prompt([
+        {
+            name: "name",
+            message: "What is the name of the product?"
+        },
+        {
+            name: "dept",
+            message: "What is the departments name?"
+        },
+        {
+            name: "price",
+            message: "What is the price?"
+        },
+        {
+            type: "number",
+            name: "quan",
+            message: "What is the quantity amount that you have?"
+        }
+    ]).then((res) => {
+        if ( isNaN(res.quan) ){
+            console.log("\n Please enter a valid quantity amount \n")
+        } else if (isNaN(res.quan)){
+            console.log("\n Please enter a valid price \n")
+        } else {
+            var quan2 = parseInt(res.quan);
+            var price2 = parseFloat(res.price);
+            conn.query(`INSERT INTO bitems (itemName, dept, price, quantity) VALUES ('${res.name}', '${res.dept}', ${price2}, ${quan2})`, (err, data) => {
+                if (err) throw err;
+                console.log("\n Product was added! \n");
+                start();
+            })
+        }
+    })
+}
