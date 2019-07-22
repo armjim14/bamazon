@@ -20,8 +20,21 @@
 ### For the manager side, the user will see these options
 ##### and for example if the user would want to know what items are low in quantitys, this is what the user will see
 
-![image lowint](images/customernolow/PNG)
+![image lowint](images/mannolow/PNG)
 
 ##### if there is something lower than 5 for quanitiy 
 
-![image yeslow](images/customerlow.PNG)
+![image yeslow](images/manlow.PNG)
+
+### if a Manager would want to add to a exsisting inventory this is how it would look like
+
+![image add inv](images/manadd.PNG)
+
+### to add a new product
+
+![image new prod](images/mannewp.PNG)
+
+# to see the stats for the departments
+### to create a new department this would just route to the manager side "add a new product" but after just gets routing back to dept
+
+![images dept](images/dept.PNG)
