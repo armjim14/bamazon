@@ -1,21 +1,22 @@
-drop DATABASE if exists store;
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';
+SET SQL_SAFE_UPDATES = 0;
 
-create DATABASE store;
+drop database store;
+
+create database store;
 
 use store;
 
-drop table if exists bitems;
+drop table if exists items;
 
-create table bitems (
+create table items (
     itemID int auto_increment PRIMARY key not null,
     itemName VARCHAR(50) not null,
     dept VARCHAR(50) not NULL,
     price decimal(4,2) not null,
-    quantity int(6) not null
+    quantity int(6) not null,
+    sale int(6) not null
 );
 
-insert into bitems (itemName, dept, price, quantity)
-values ("name", "dept", 20.00, 10);
-
-insert into bitems (itemName, dept, price, quantity)
-values ("bike", "outsite", 50, 20);
+insert into items (itemName, dept, price, quantity, sale)
+values ("socks", "clothing", 9.99, 25, 0);

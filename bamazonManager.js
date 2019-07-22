@@ -23,7 +23,7 @@ function getPerson(){
             type: "list",
             name: "who",
             message: "what is your role?",
-            choices: ["Customer", "Manager"]
+            choices: ["Customer", "Manager", "Departments"]
         }
     ]).then((res) => {
         switch(res.who){
@@ -32,6 +32,9 @@ function getPerson(){
                 break;
             case "Manager":
                 start2();
+                break;
+            case "Departments":
+                start3();
                 break;
             default: break;
         }
@@ -83,14 +86,14 @@ function buyItem(){
                 } else {
                     var idd = parseInt(res2.num);
                     var amount = parseInt(res2.amount);
-                    conn.query(`SELECT * FROM bitems WHERE itemID = ${idd}`, (err, data) => {
+                    conn.query(`SELECT * FROM items WHERE itemID = ${idd}`, (err, data) => {
                         if (err) throw err;
 
                         if ( amount > data[0].quantity ){
                             console.log("\n Insufficient quantity! \n");
                             start();
                         } else {
-                            buyFinal(idd, amount, data[0].quantity);
+                            buyFinal(idd, amount, data[0].quantity, data[0].sale, data[0].price);
                         }
                     })
                 }
@@ -101,13 +104,19 @@ function buyItem(){
     })
 }
 
-function buyFinal(id, am, qu){
+function buyFinal(id, am, qu, num, price){
     var both = qu - am;
-    conn.query(`UPDATE bitems SET quantity = ${both} WHERE itemID = ${id}`, (err, data) => {
+    conn.query(`UPDATE items SET quantity = ${both} WHERE itemID = ${id}`, (err, data) => {
         if (err) throw err;
         console.log("\n Your Purchase went through \n");
-        start();
+        updateTable(id, am, num, price);
     })
+}
+
+function updateTable(id, am, num, price){
+    var number = am + price
+    conn.query(`UPDATE items SET sale = ${number} WHERE itemID = ${id}`);
+    start();
 }
 
 function start2(){
@@ -129,7 +138,7 @@ function start2(){
                     addToLow();
                     break;
                 case "Add New Product":
-                    postItem();
+                    postItem(0);
                     break;
                 case "Switch Role":
                         getPerson();
@@ -142,7 +151,7 @@ function start2(){
 sendover();
 
 function viewItems(num){
-    conn.query("SELECT * FROM bitems", (err, data) => {
+    conn.query("SELECT * FROM items", (err, data) => {
         if (err) throw err;
         console.log("---------------\n");
         console.log("ID | NAME | DEPARTMENT | PRICE | QUANTITY ")
@@ -159,7 +168,7 @@ function viewItems(num){
 }
 
 function viewLow(){
-    conn.query("select * from bitems where quantity < 6", (err, data) => {
+    conn.query("select * from items where quantity < 6", (err, data) => {
         if (err) throw err;
         if (data.length == 0){
             console.log("\n You have no items that are low in quantity \n ");
@@ -225,7 +234,7 @@ function nextAdd(){
         } else {
             var id = parseInt(res.id);
             var amount = parseInt(res.amount);
-            conn.query(`SELECT * FROM bitems WHERE itemID = ${id}`, (err, data) => {
+            conn.query(`SELECT * FROM items WHERE itemID = ${id}`, (err, data) => {
                 if (err) throw err;
                 nextAddTwo(id, amount, data[0].quantity);
             })
@@ -235,13 +244,13 @@ function nextAdd(){
 
 function nextAddTwo(id, amount, quan){
     var both = amount + quan;
-    conn.query(`UPDATE bitems SET quantity = ${both} WHERE itemID = ${id}`, (err, data) => {
+    conn.query(`UPDATE items SET quantity = ${both} WHERE itemID = ${id}`, (err, data) => {
         console.log("\n\ Quantity was updated \n")
         start2();
     })
 }
 
-function postItem(){
+function postItem(n){
     inq.prompt([
         {
             name: "name",
@@ -268,11 +277,59 @@ function postItem(){
         } else {
             var quan2 = parseInt(res.quan);
             var price2 = parseFloat(res.price);
-            conn.query(`INSERT INTO bitems (itemName, dept, price, quantity) VALUES ('${res.name}', '${res.dept}', ${price2}, ${quan2})`, (err, data) => {
+            conn.query(`INSERT INTO items (itemName, dept, price, quantity, sale) VALUES ('${res.name}', '${res.dept}', ${price2}, ${quan2}, 0)`, (err, data) => {
                 if (err) throw err;
                 console.log("\n Product was added! \n");
-                start2();
+                manUpdate(res.dept, n);
             })
         }
+    })
+}
+
+function manUpdate(name, n){
+    conn.query(`insert into dept (deptName, overhead) values ('${name}', 100)`, (err, data) => {
+        if (err) throw err;
+
+        if (n == 0){
+            start2();
+        } else {
+            start3();
+        }
+    })
+}
+
+function start3() {
+    inq.prompt([
+        {
+            type: "list",
+            name: "option",
+            choices: ["View Product Sales by Department", "Create New Department", "Switch Role"]
+        }
+    ]).then((res) => {
+        if ( res.option == "View Product Sales by Department" ){
+            viewSales();
+        } else if ( res.option == "Create New Department" ) {
+            postItem(1);
+        } else {
+            getPerson();
+        }
+    })
+}
+
+function viewSales() {
+    conn.query(`SELECT dept.deptID, dept.deptName, dept.overhead, items.sale FROM dept INNER JOIN items WHERE dept.deptName = items.dept`, (err, data) => {
+        if (err) throw err;
+        console.log('----------\n')
+        console.log('ID | Department | OverHead | sales | Profit');
+        var init = [];
+        for (let e in data){
+            if (!init.includes(data[e].deptID)){
+                init.push(data[e].deptID);
+                let numx =  data[e].sale - data[e].overhead;
+                console.log(`${data[e].deptID} | ${data[e].deptName} | ${data[e].overhead} | ${data[e].sale} | ${numx}`);
+            }
+        }
+        console.log('\n-----------')
+        start3();
     })
 }
