@@ -9,4 +9,19 @@
 
 ### This is how the customer sees the items ( *This is how it also looks for the manager )
 
+![image seeItems](images/customerview.PNG)
+
+### When the customer wants to buy something this is what the user will see
+##### It first asks you a question if you got the product ID, If the user does not it shows the all products so the user can get it
+##### Then the user has to input the ID number which gets valided, Then finally how much of the product would you like to buy
+
 ![image seeItems](images/customerbuy.PNG)
+
+### For the manager side, the user will see these options
+##### and for example if the user would want to know what items are low in quantitys, this is what the user will see
+
+![image lowint](images/customernolow/PNG)
+
+##### if there is something lower than 5 for quanitiy 
+
+![image yeslow](images/customerlow.PNG)
